@@ -6,8 +6,10 @@ namespace CombatRandomizer.Settings
     public enum Difficulty 
     {
         Extreme = 4,
-        Hard = 2,
-        Normal = 1,
-        Easy = 0
+        Hard = 3,
+        Intermediate = 2,
+        Standard = 1,
+        Easy = 0,
+        Disabled = -1
     }
 }

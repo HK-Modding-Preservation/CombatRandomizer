@@ -31,7 +31,7 @@ public class NotchFragment : AbstractItem
 
     public override void GiveImmediate(GiveInfo info)
     {
-        int fragmentsPerNotch = Math.Min((int)CombatModule.Instance.Settings.Difficulty + 2, 4);
+        int fragmentsPerNotch = Math.Min((int)CombatModule.Instance.Settings.NotchFragments + 2, 4);
         CombatModule.Instance.NotchFragments += 1;
         if (UIDef is MsgUIDef ui && !Redundant())
             ui.name = new BoxedString($"{ui.name.Value} ({CombatModule.Instance.NotchFragments} / {fragmentsPerNotch})");
@@ -46,6 +46,5 @@ public class NotchFragment : AbstractItem
             // Reset notch fragments variable
             CombatModule.Instance.NotchFragments = 0;
         }
-
     }
 }

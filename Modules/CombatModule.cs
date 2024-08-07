@@ -1,9 +1,9 @@
-using System;
 using CombatRandomizer.Manager;
 using CombatRandomizer.Settings;
 using ItemChanger;
 using ItemChanger.Modules;
 using Modding;
+using System;
 using UnityEngine;
 
 namespace CombatRandomizer.Modules
@@ -13,7 +13,10 @@ namespace CombatRandomizer.Modules
         public SaveSettings Settings { get; set; } = new();
         public class SaveSettings 
         {
-            public Difficulty Difficulty = CombatManager.Settings.Difficulty;
+            public Difficulty NailDamage = CombatManager.Settings.NailDamage;
+            public Difficulty NotchFragments = CombatManager.Settings.NotchFragments;
+            public Difficulty SoulGain = CombatManager.Settings.SoulGain;
+            public Difficulty SoulPlugs = CombatManager.Settings.SoulPlugs;
             public bool LimitNailDamage = CombatManager.Settings.LimitNailDamage;
         }
         // Module properties
@@ -45,11 +48,13 @@ namespace CombatRandomizer.Modules
             if (Frames == 120)
             {
                 int amount = 1;
-                if (Settings.Difficulty == Difficulty.Normal)
+                if (Settings.SoulPlugs == Difficulty.Standard)
+                    amount = 2;
+                if (Settings.SoulPlugs == Difficulty.Intermediate)
                     amount = 3;
-                if (Settings.Difficulty == Difficulty.Hard)
+                if (Settings.SoulPlugs == Difficulty.Hard)
                     amount = 5;
-                if (Settings.Difficulty == Difficulty.Extreme)
+                if (Settings.SoulPlugs == Difficulty.Extreme)
                     amount = 7;
                 amount -= SoulPlugItems;
                 PlayerData.instance.TakeMP(amount);
@@ -60,6 +65,10 @@ namespace CombatRandomizer.Modules
 
         private int OverrideSoulGain(int soul)
         {
+            // Have the Nail Damage be refreshed when hitting enemies, in the event Wings or Claw are obtained
+            // and the damage is limited.
+            PlayerData.instance.GetInt("nailDamage");
+
             // By default, you get 11 soul + 3 with SC + 8 with SE.
             // If main mana pool is full, you get a reduced 6 + 2 + 6.
             // Using these as reference, the charms will now grant a relative multiplier
@@ -75,13 +84,15 @@ namespace CombatRandomizer.Modules
             }
 
             // Base gain depends on settings, and further gain is obtained with the item checks.
-            if (Settings.Difficulty == Difficulty.Easy)
+            if (Settings.SoulGain == Difficulty.Easy)
                 soul = 8;
-            if (Settings.Difficulty == Difficulty.Normal)
-                soul = 6; 
-            if (Settings.Difficulty == Difficulty.Hard)
+            if (Settings.SoulGain == Difficulty.Standard)
+                soul = 6;
+            if (Settings.SoulGain == Difficulty.Intermediate)
+                soul = 4; 
+            if (Settings.SoulGain == Difficulty.Hard)
                 soul = 3;
-            if (Settings.Difficulty == Difficulty.Extreme)
+            if (Settings.SoulGain == Difficulty.Extreme)
                 soul = 1;
             
             soul += SoulGainItems;
@@ -93,36 +104,36 @@ namespace CombatRandomizer.Modules
         {
             if (name == "nailDamage")
             {
-                int base_damage = Settings.Difficulty >= Difficulty.Hard ? (5 - (int)Settings.Difficulty) : 5;
+                int base_damage = Settings.NailDamage >= Difficulty.Intermediate ? (5 - (int)Settings.NailDamage) : 5;
                 orig = base_damage + NailItems;
-            }
-
-            // If required, cap max damage based on obtained vert items.
-            if (Settings.LimitNailDamage)
-            {
-                bool hasWings = PlayerData.instance.hasDoubleJump;
-                bool anyClaw = false;
-                bool hasClaw = PlayerData.instance.hasWalljump;
-                SplitClaw splitClaw = ItemChangerMod.Modules.Get<SplitClaw>();
-                if (splitClaw != null)
-                {
-                    anyClaw = splitClaw.hasWalljumpAny;
-                    hasClaw = splitClaw.hasWalljumpBoth;
-                }
-
-                // If no Wings or Claw, then max one vanilla upgrade
-                if (!hasWings || !anyClaw || !hasClaw)
-                    orig = Math.Min(orig, 9);
                 
-                // If no Wings and Split Claw, allow two upgrades
-                if (anyClaw & !hasWings & !hasClaw)
-                    orig = Math.Min(orig, 13);
+                // If required, cap max damage based on obtained vert items.
+                if (Settings.LimitNailDamage)
+                {
+                    bool hasWings = PlayerData.instance.hasDoubleJump;
+                    bool anyClaw = false;
+                    bool hasClaw = PlayerData.instance.hasWalljump;
+                    SplitClaw splitClaw = ItemChangerMod.Modules.Get<SplitClaw>();
+                    if (splitClaw != null)
+                    {
+                        anyClaw = splitClaw.hasWalljumpAny;
+                        hasClaw = splitClaw.hasWalljumpBoth;
+                    }
 
-                // If Wings but no Claw, allow three upgrades
-                if (hasWings & !hasClaw & !hasClaw)
-                    orig = Math.Min(orig, 17);
+                    // If no Wings or Claw, then max one vanilla upgrade
+                    if (!hasWings || !anyClaw || !hasClaw)
+                        orig = Math.Min(orig, 9);
+                    
+                    // If no Wings and Split Claw, allow two upgrades
+                    if (anyClaw & !hasWings & !hasClaw)
+                        orig = Math.Min(orig, 13);
 
-                // If Claw or Wings + Split Claw, do nothing
+                    // If Wings but no Claw, allow three upgrades
+                    if (hasWings & !hasClaw & !hasClaw)
+                        orig = Math.Min(orig, 17);
+
+                    // If Claw or Wings + Split Claw, do nothing
+                }
             }
             return orig;
         }
