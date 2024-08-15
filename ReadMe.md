@@ -23,8 +23,8 @@ Nail Upgrades are made entirely cosmetic, and base nail damage is determined by 
 - Easy: You can earn up to 20 damage, making you deal 4 more damage than in vanilla when fully geared.
 - Standard: You can earn up to 16 damage, equivalent to all 4 vanilla upgrades.
 - Intermediate: You can earn up to 18 damage, but start dealing 3 instead of the standard 5.
-- Hard: You can earn up to 15 damage, but start dealing 2 instead of the standard 5, leading to a maximum of 17 damage (equivalent to 3 nail upgrades).
-- Extreme: You can earn up to 12 damage, but start dealing 1 instead of the standard 5, leading to a maximum of 13 damage (equivalent to 2 nail upgrades).
+- Hard: You can earn up to 14 damage, but start dealing 3 instead of the standard 5, leading to a maximum of 17 damage (equivalent to 3 nail upgrades).
+- Extreme: You can earn up to 11 damage, but start dealing 2 instead of the standard 5, leading to a maximum of 13 damage (equivalent to 2 nail upgrades).
 
 ### Soul Gain
 

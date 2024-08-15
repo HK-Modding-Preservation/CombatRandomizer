@@ -46,10 +46,19 @@ namespace CombatRandomizer.Manager {
             if (nailDiff == Difficulty.Intermediate)
                 nailItems = 18;
             if (nailDiff == Difficulty.Hard)
-                nailItems = 15;
+                nailItems = 14;
             if (nailDiff == Difficulty.Extreme)
-                nailItems = 12;
+                nailItems = 11;
             rb.AddItemByName("Nail_Damage", nailItems);
+            rb.EditItemRequest("Nail_Damage", info => {
+                info.getItemDef = () => new() 
+                {
+                    Name = "Nail_Damage",
+                    Pool = "Nail Upgrades",
+                    PriceCap = 500,
+                    MajorItem = false
+                };
+            });
 
             // Replace Charm Notches with Notch Fragments
             if (CombatManager.Settings.NotchFragments > Difficulty.Disabled)
@@ -65,6 +74,15 @@ namespace CombatRandomizer.Manager {
                     totalNotches -= 5;
                 int notchFragments = totalNotches * fragmentsPerNotch;
                 rb.AddItemByName("Notch_Fragment", notchFragments);
+                rb.EditItemRequest("Notch_Fragment", info => {
+                    info.getItemDef = () => new() 
+                    {
+                        Name = "Notch_Fragment",
+                        Pool = "Charm Notches",
+                        PriceCap = 500,
+                        MajorItem = false
+                    };
+                });
             }
 
             // Soul Gain: 7 if Intermediate else 5.
@@ -77,35 +95,48 @@ namespace CombatRandomizer.Manager {
                 else
                     soulGainItems = 5;
                 rb.AddItemByName("Soul_Gain", soulGainItems);
-            }
+                rb.EditItemRequest("Soul_Gain", info => {
+                    info.getItemDef = () => new() 
+                    {
+                        Name = "Soul_Gain",
+                        Pool = "Soul Upgrades",
+                        PriceCap = 500,
+                        MajorItem = false
+                    };
+                });
+            };
 
-            // Soul Plug: 1 if Easy, 3 if Normal, 5 if Hard/Extreme.
+            // Soul Plug: 1 + difficulty tier
             Difficulty drainDiff = CombatManager.Settings.SoulPlugs;
-            int soulPlugItems = 0;
-            if (drainDiff == Difficulty.Easy)
-                soulPlugItems = 1;
-            if (drainDiff == Difficulty.Standard)
-                soulPlugItems = 3;
-            if (drainDiff >= Difficulty.Hard)
-                soulPlugItems = 5;
+            int soulPlugItems = 1 + (int)drainDiff;
             rb.AddItemByName("Soul_Plug", soulPlugItems);
+            rb.EditItemRequest("Soul_Plug", info => {
+                info.getItemDef = () => new() 
+                {
+                    Name = "Soul_Plug",
+                    Pool = "Soul Upgrades",
+                    PriceCap = 2000,
+                    MajorItem = false
+                };
+            });
         }
+            
 
         private static void SetPI(LogicManager lm, GenerationSettings gs, ProgressionInitializer pi)
         {
             if (!CombatManager.Settings.Enabled)
                 return;
             
-            // Nail damage: (21 - max damage) + base damage for starting PI to check for Nail Upgrade logic.
+            // Nail damage: (21 - available items) for starting PI to check for Nail Upgrade logic.
             int nailDamage = 5;
             if (CombatManager.Settings.NailDamage == Difficulty.Disabled)
                 nailDamage = 21;
             if (CombatManager.Settings.NailDamage == Difficulty.Intermediate)
                 nailDamage = 3;
             if (CombatManager.Settings.NailDamage == Difficulty.Hard)
-                nailDamage = 6;
+                nailDamage = 7;
             if (CombatManager.Settings.NailDamage == Difficulty.Extreme)
-                nailDamage = 9;
+                nailDamage = 10;
 
             // (11 - max gain) + base gain for starting PI for Soul Gain.
             int soulGain = 11;
@@ -120,18 +151,8 @@ namespace CombatRandomizer.Manager {
             if (CombatManager.Settings.SoulGain == Difficulty.Extreme)
                 soulGain = 6;
             
-            // Maximum is 7 - which means no soul loss. Starts at 7 - setting drain.
-            int soulPlug = 7;
-            if (CombatManager.Settings.SoulPlugs == Difficulty.Easy)
-                soulPlug = 6;
-            if (CombatManager.Settings.SoulPlugs == Difficulty.Standard)
-                soulPlug = 5;
-            if (CombatManager.Settings.SoulPlugs == Difficulty.Intermediate)
-                soulPlug = 4;
-            if (CombatManager.Settings.SoulPlugs == Difficulty.Hard)
-                soulPlug = 3;
-            if (CombatManager.Settings.SoulPlugs == Difficulty.Extreme)
-                soulPlug = 2;
+            // Maximum is 5 - which means all Soul Plug items have been obtained.
+            int soulPlug = 4 - (int)CombatManager.Settings.SoulPlugs;
 
             pi.Setters.Add(new(lm.GetTermStrict("NAILDAMAGE"), nailDamage));
             pi.Setters.Add(new(lm.GetTermStrict("SOULGAIN"), soulGain));

@@ -31,8 +31,6 @@ public class NailDamage : AbstractItem
     public override void GiveImmediate(GiveInfo info)
     {
         CombatModule.Instance.NailItems += 1;
-
-        // We call this to refresh the damage
-        PlayerData.instance.GetInt("nailDamage");
+        CombatModule.Instance.SetNailDamage();  
     }
 }

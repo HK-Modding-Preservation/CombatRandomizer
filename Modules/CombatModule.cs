@@ -28,13 +28,11 @@ namespace CombatRandomizer.Modules
         public static CombatModule Instance => ItemChangerMod.Modules.GetOrAdd<CombatModule>();
         public override void Unload() 
         {
-            ModHooks.GetPlayerIntHook -= OverrideNailDamage;
             ModHooks.SoulGainHook -= OverrideSoulGain;
             ModHooks.HeroUpdateHook -= SoulDrain;
         }
         public override void Initialize() 
         {
-            ModHooks.GetPlayerIntHook += OverrideNailDamage;
             ModHooks.SoulGainHook += OverrideSoulGain;
             ModHooks.HeroUpdateHook += SoulDrain;
         }
@@ -57,7 +55,7 @@ namespace CombatRandomizer.Modules
                 if (Settings.SoulPlugs == Difficulty.Extreme)
                     amount = 7;
                 amount -= SoulPlugItems;
-                PlayerData.instance.TakeMP(amount);
+                PlayerData.instance.TakeMP(Math.Max(0, amount));
                 GameCameras.instance.soulOrbFSM.SendEvent("MP DRAIN");
                 Frames = 0;
             }
@@ -67,7 +65,7 @@ namespace CombatRandomizer.Modules
         {
             // Have the Nail Damage be refreshed when hitting enemies, in the event Wings or Claw are obtained
             // and the damage is limited.
-            PlayerData.instance.GetInt("nailDamage");
+            SetNailDamage();
 
             // By default, you get 11 soul + 3 with SC + 8 with SE.
             // If main mana pool is full, you get a reduced 6 + 2 + 6.
@@ -100,42 +98,40 @@ namespace CombatRandomizer.Modules
             return soul;
         }
 
-        private int OverrideNailDamage(string name, int orig)
+        public void SetNailDamage()
         {
-            if (name == "nailDamage")
+            int base_damage = Settings.NailDamage >= Difficulty.Hard ? (6 - (int)Settings.NailDamage) : (Settings.NailDamage == Difficulty.Intermediate ? 3 : 5);
+            int damage = base_damage + NailItems;
+            
+            // If required, cap max damage based on obtained vert items.
+            if (Settings.LimitNailDamage)
             {
-                int base_damage = Settings.NailDamage >= Difficulty.Intermediate ? (5 - (int)Settings.NailDamage) : 5;
-                orig = base_damage + NailItems;
-                
-                // If required, cap max damage based on obtained vert items.
-                if (Settings.LimitNailDamage)
+                bool hasWings = PlayerData.instance.hasDoubleJump;
+                bool anyClaw = false;
+                bool hasClaw = PlayerData.instance.hasWalljump;
+                SplitClaw splitClaw = ItemChangerMod.Modules.Get<SplitClaw>();
+                if (splitClaw != null)
                 {
-                    bool hasWings = PlayerData.instance.hasDoubleJump;
-                    bool anyClaw = false;
-                    bool hasClaw = PlayerData.instance.hasWalljump;
-                    SplitClaw splitClaw = ItemChangerMod.Modules.Get<SplitClaw>();
-                    if (splitClaw != null)
-                    {
-                        anyClaw = splitClaw.hasWalljumpAny;
-                        hasClaw = splitClaw.hasWalljumpBoth;
-                    }
-
-                    // If no Wings or Claw, then max one vanilla upgrade
-                    if (!hasWings || !anyClaw || !hasClaw)
-                        orig = Math.Min(orig, 9);
-                    
-                    // If no Wings and Split Claw, allow two upgrades
-                    if (anyClaw & !hasWings & !hasClaw)
-                        orig = Math.Min(orig, 13);
-
-                    // If Wings but no Claw, allow three upgrades
-                    if (hasWings & !hasClaw & !hasClaw)
-                        orig = Math.Min(orig, 17);
-
-                    // If Claw or Wings + Split Claw, do nothing
+                    anyClaw = splitClaw.hasWalljumpAny;
+                    hasClaw = splitClaw.hasWalljumpBoth;
                 }
+
+                // If no Wings or Claw, then max one vanilla upgrade
+                if (!hasWings || !anyClaw || !hasClaw)
+                    damage = Math.Min(damage, 9);
+                
+                // If no Wings and Split Claw, allow two upgrades
+                if (anyClaw & !hasWings & !hasClaw)
+                    damage = Math.Min(damage, 13);
+
+                // If Wings but no Claw, allow three upgrades
+                if (hasWings & !hasClaw & !hasClaw)
+                    damage = Math.Min(damage, 17);
+
+                // If Claw or Wings + Split Claw, do nothing
             }
-            return orig;
+            PlayerData.instance.nailDamage = damage;
+            PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
         }
     }
 }
