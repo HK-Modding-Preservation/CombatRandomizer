@@ -28,6 +28,7 @@ namespace CombatRandomizer.Manager
             if (Settings.Enabled)
             {
                 CombatModule module = ItemChangerMod.Modules.GetOrAdd<CombatModule>();
+                module.SetNailDamage();
                 // Enforce damage limit if Enemy Pogo setting is on
                 module.Settings.LimitNailDamage = module.Settings.LimitNailDamage || args.gs.SkipSettings.EnemyPogos;
             }

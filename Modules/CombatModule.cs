@@ -35,11 +35,33 @@ namespace CombatRandomizer.Modules
         {
             ModHooks.SoulGainHook += OverrideSoulGain;
             ModHooks.HeroUpdateHook += SoulDrain;
+            for (int i = 1; i <= 5; i++) Events.AddLanguageEdit(new("UI", "INV_DESC_NAIL" + i), ShowDamage);
+        }
+
+        private void ShowDamage(ref string value)
+        {
+            if (Settings.NailDamage == Difficulty.Disabled)
+                return;
+            
+            int damage = PlayerData.instance.nailDamage;
+            value += $"<br>This nail currently deals {damage} damage. ";
+            if (damage < 5)
+                value += "This is less damage than an old nail.";
+            if (damage >= 5 && damage < 9)
+                value += "This is similar to an old nail.";
+            if (damage >= 9 && damage < 13)
+                value += "This is similar to a sharpened nail.";
+            if (damage >= 13 && damage < 17)
+                value += "This is similar to a channeled nail.";
+            if (damage >= 17 && damage < 21)
+                value += "This is similar to a coiled nail.";
+            if (damage >= 21)
+                value += "This is powerful as a pure nail.";
         }
 
         private void SoulDrain()
         {
-            if (GameManager.instance.isPaused)
+            if (GameManager.instance.isPaused || Settings.SoulPlugs == Difficulty.Disabled)
                 return;
             
             Frames += 1;
@@ -66,6 +88,9 @@ namespace CombatRandomizer.Modules
             // Have the Nail Damage be refreshed when hitting enemies, in the event Wings or Claw are obtained
             // and the damage is limited.
             SetNailDamage();
+
+            if (Settings.SoulGain == Difficulty.Disabled)
+                return soul;
 
             // By default, you get 11 soul + 3 with SC + 8 with SE.
             // If main mana pool is full, you get a reduced 6 + 2 + 6.
@@ -100,6 +125,9 @@ namespace CombatRandomizer.Modules
 
         public void SetNailDamage()
         {
+            if (Settings.NailDamage == Difficulty.Disabled)
+                return;
+            
             int base_damage = Settings.NailDamage >= Difficulty.Hard ? (6 - (int)Settings.NailDamage) : (Settings.NailDamage == Difficulty.Intermediate ? 3 : 5);
             int damage = base_damage + NailItems;
             
