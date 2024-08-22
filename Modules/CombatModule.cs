@@ -77,8 +77,11 @@ namespace CombatRandomizer.Modules
                 if (Settings.SoulPlugs == Difficulty.Extreme)
                     amount = 7;
                 amount -= SoulPlugItems;
-                PlayerData.instance.TakeMP(Math.Max(0, amount));
-                GameCameras.instance.soulOrbFSM.SendEvent("MP DRAIN");
+                if (amount > 0)
+                {
+                    PlayerData.instance.TakeMP(amount);
+                    GameCameras.instance.soulOrbFSM.SendEvent("MP DRAIN");
+                }
                 Frames = 0;
             }
         }
@@ -140,12 +143,12 @@ namespace CombatRandomizer.Modules
                 SplitClaw splitClaw = ItemChangerMod.Modules.Get<SplitClaw>();
                 if (splitClaw != null)
                 {
-                    anyClaw = splitClaw.hasWalljumpAny;
-                    hasClaw = splitClaw.hasWalljumpBoth;
+                    anyClaw = splitClaw.hasWalljumpLeft || splitClaw.hasWalljumpRight;
+                    hasClaw = splitClaw.hasWalljumpLeft & splitClaw.hasWalljumpRight;
                 }
 
                 // If no Wings or Claw, then max one vanilla upgrade
-                if (!hasWings || !anyClaw || !hasClaw)
+                if (!hasWings & !anyClaw & !hasClaw)
                     damage = Math.Min(damage, 9);
                 
                 // If no Wings and Split Claw, allow two upgrades
@@ -153,7 +156,7 @@ namespace CombatRandomizer.Modules
                     damage = Math.Min(damage, 13);
 
                 // If Wings but no Claw, allow three upgrades
-                if (hasWings & !hasClaw & !hasClaw)
+                if (hasWings & !anyClaw & !hasClaw)
                     damage = Math.Min(damage, 17);
 
                 // If Claw or Wings + Split Claw, do nothing

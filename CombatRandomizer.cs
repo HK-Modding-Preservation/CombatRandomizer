@@ -9,7 +9,7 @@ namespace CombatRandomizer
     public class CombatRandomizer : Mod, IGlobalSettings<CombatSettings> 
     {
         new public string GetName() => "CombatRandomizer";
-        public override string GetVersion() => "1.0.1.2";
+        public override string GetVersion() => "1.0.1.3";
 
         private static CombatRandomizer _instance;
         public CombatRandomizer() : base()
