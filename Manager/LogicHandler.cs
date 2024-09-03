@@ -13,7 +13,7 @@ namespace CombatRandomizer.Manager
         {
             RCData.RuntimeLogicOverride.Subscribe(5f, ApplyLogic);
             if (ModHooks.GetMod("GodhomeRandomizer") is Mod)
-                RCData.RuntimeLogicOverride.Subscribe(100f, GodhomeRandoInterop);
+                RCData.RuntimeLogicOverride.Subscribe(2000f, GodhomeRandoInterop);
         }
 
         private static void ApplyLogic(GenerationSettings gs, LogicManagerBuilder lmb)
@@ -38,7 +38,7 @@ namespace CombatRandomizer.Manager
             lmb.DoMacroEdit(new("AERIALMINIBOSS", "ORIG + (NAILDAMAGE>4 + SOULGAIN>7 + SOULPLUG>3 | NAILDAMAGE>4 + SOULGAIN>5 + SOULPLUG>1 + MILDCOMBATSKIPS | SPICYCOMBATSKIPS)"));
             lmb.DoMacroEdit(new("BOSS", "ORIG + (NAILDAMAGE>4 + SOULGAIN>7 + SOULPLUG>3 | NAILDAMAGE>4 + SOULGAIN>5 + SOULPLUG>1 + MILDCOMBATSKIPS | SPICYCOMBATSKIPS)"));
             lmb.DoMacroEdit(new("BOSSFLUKE", "ORIG + (SOULGAIN>7 + SOULPLUG>3 | NAILDAMAGE>4 + SOULGAIN>5 + SOULPLUG>1 + MILDCOMBATSKIPS | SPICYCOMBATSKIPS) | NAILDAMAGE>12 + MILDCOMBATSKIPS | NAILDAMAGE>8 + SPICYCOMBATSKIPS"));
-            lmb.DoMacroEdit(new("MINIBOSS", "ORIG + (NAILDAMAGE>4 + SOULGAIN>6 + SOULPLUG>1 | NAILDAMAGE>4 + SOULPLUG + MILDCOMBATSKIPS | SPICYCOMBATSKIPS)"));
+            lmb.DoMacroEdit(new("MINIBOSS", "ORIG + (NAILDAMAGE>4 + SOULGAIN>4 + SOULPLUG | NAILDAMAGE>2 + MILDCOMBATSKIPS | SPICYCOMBATSKIPS)"));
         }
 
         private static void GodhomeRandoInterop(GenerationSettings gs, LogicManagerBuilder lmb)

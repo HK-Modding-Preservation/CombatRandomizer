@@ -28,6 +28,12 @@ public class NailDamage : AbstractItem
         return tag;
     }
 
+    public override bool Redundant()
+    {
+        CombatModule.Instance.SetNailDamage();
+        return PlayerData.instance.nailDamage >= 21;
+    }
+
     public override void GiveImmediate(GiveInfo info)
     {
         CombatModule.Instance.NailItems += 1;

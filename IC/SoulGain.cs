@@ -28,6 +28,10 @@ public class SoulGain : AbstractItem
         return tag;
     }
 
+    public override bool Redundant()
+    {
+        return CombatModule.Instance.SoulGainItems + CombatModule.Instance.Settings.SoulGain.SoulGainSettings.BaseGain >= 11;
+    }
     public override void GiveImmediate(GiveInfo info)
     {
         CombatModule.Instance.SoulGainItems += 1;

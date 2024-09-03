@@ -13,11 +13,10 @@ namespace CombatRandomizer.Modules
         public SaveSettings Settings { get; set; } = new();
         public class SaveSettings 
         {
-            public Difficulty NailDamage = CombatManager.Settings.NailDamage;
-            public Difficulty NotchFragments = CombatManager.Settings.NotchFragments;
-            public Difficulty SoulGain = CombatManager.Settings.SoulGain;
-            public Difficulty SoulPlugs = CombatManager.Settings.SoulPlugs;
-            public bool LimitNailDamage = CombatManager.Settings.LimitNailDamage;
+            public NailSettings NailSettings = CombatManager.Settings.NailSettings;
+            public NotchSettings NotchSettings = CombatManager.Settings.NotchSettings;
+            public GainSettings SoulGain = CombatManager.Settings.GainSettings;
+            public DrainSettings SoulPlugs = CombatManager.Settings.DrainSettings;
         }
         // Module properties
         public int NailItems { get; set; } = 0;
@@ -29,18 +28,18 @@ namespace CombatRandomizer.Modules
         public override void Unload() 
         {
             ModHooks.SoulGainHook -= OverrideSoulGain;
-            ModHooks.HeroUpdateHook -= SoulDrain;
+            On.HeroController.FixedUpdate -= SoulDrain;
         }
         public override void Initialize() 
         {
             ModHooks.SoulGainHook += OverrideSoulGain;
-            ModHooks.HeroUpdateHook += SoulDrain;
+            On.HeroController.FixedUpdate += SoulDrain;
             for (int i = 1; i <= 5; i++) Events.AddLanguageEdit(new("UI", "INV_DESC_NAIL" + i), ShowDamage);
         }
 
         private void ShowDamage(ref string value)
         {
-            if (Settings.NailDamage == Difficulty.Disabled)
+            if (!Settings.NailSettings.Enabled)
                 return;
             
             int damage = PlayerData.instance.nailDamage;
@@ -59,24 +58,16 @@ namespace CombatRandomizer.Modules
                 value += "This is powerful as a pure nail.";
         }
 
-        private void SoulDrain()
+        private void SoulDrain(On.HeroController.orig_FixedUpdate orig, HeroController self)
         {
-            if (GameManager.instance.isPaused || Settings.SoulPlugs == Difficulty.Disabled)
+            orig(self);
+            if (GameManager.instance.isPaused || !Settings.SoulPlugs.Enabled)
                 return;
             
             Frames += 1;
-            if (Frames == 120)
+            if (Frames >= 100)
             {
-                int amount = 1;
-                if (Settings.SoulPlugs == Difficulty.Standard)
-                    amount = 2;
-                if (Settings.SoulPlugs == Difficulty.Intermediate)
-                    amount = 3;
-                if (Settings.SoulPlugs == Difficulty.Hard)
-                    amount = 5;
-                if (Settings.SoulPlugs == Difficulty.Extreme)
-                    amount = 7;
-                amount -= SoulPlugItems;
+                int amount = Settings.SoulPlugs.SoulDrainSettings.BaseDrain - SoulPlugItems;
                 if (amount > 0)
                 {
                     PlayerData.instance.TakeMP(amount);
@@ -90,9 +81,10 @@ namespace CombatRandomizer.Modules
         {
             // Have the Nail Damage be refreshed when hitting enemies, in the event Wings or Claw are obtained
             // and the damage is limited.
-            SetNailDamage();
+            if (Settings.NailSettings.Enabled)
+                SetNailDamage();
 
-            if (Settings.SoulGain == Difficulty.Disabled)
+            if (!Settings.SoulGain.Enabled)
                 return soul;
 
             // By default, you get 11 soul + 3 with SC + 8 with SE.
@@ -100,42 +92,25 @@ namespace CombatRandomizer.Modules
             // Using these as reference, the charms will now grant a relative multiplier
             // instead of an absolute amount of soul per hit.
             float multiplier;
-            if (PlayerData.instance.MPCharge < 99)
-            {
-                multiplier = soul / 11;
-            }
-            else
-            {
-                multiplier = soul / 6;
-            }
+            multiplier = soul / 11;
 
             // Base gain depends on settings, and further gain is obtained with the item checks.
-            if (Settings.SoulGain == Difficulty.Easy)
-                soul = 8;
-            if (Settings.SoulGain == Difficulty.Standard)
-                soul = 6;
-            if (Settings.SoulGain == Difficulty.Intermediate)
-                soul = 4; 
-            if (Settings.SoulGain == Difficulty.Hard)
-                soul = 3;
-            if (Settings.SoulGain == Difficulty.Extreme)
-                soul = 1;
-            
-            soul += SoulGainItems;
+            soul = Settings.SoulGain.SoulGainSettings.BaseGain + SoulGainItems;
+
+            // A multiplier is used to account for Soul gain charms and/or extra vessel fragments
             soul = Mathf.FloorToInt(multiplier * soul);
             return soul;
         }
 
         public void SetNailDamage()
         {
-            if (Settings.NailDamage == Difficulty.Disabled)
+            if (!Settings.NailSettings.Enabled)
                 return;
             
-            int base_damage = Settings.NailDamage >= Difficulty.Hard ? (6 - (int)Settings.NailDamage) : (Settings.NailDamage == Difficulty.Intermediate ? 3 : 5);
-            int damage = base_damage + NailItems;
+            int damage = Settings.NailSettings.NailDamageSettings.BaseDamage + NailItems;
             
             // If required, cap max damage based on obtained vert items.
-            if (Settings.LimitNailDamage)
+            if (Settings.NailSettings.LimitNailDamage)
             {
                 bool hasWings = PlayerData.instance.hasDoubleJump;
                 bool anyClaw = false;

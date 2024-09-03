@@ -28,6 +28,10 @@ public class SoulPlug : AbstractItem
         return tag;
     }
 
+    public override bool Redundant()
+    {
+        return CombatModule.Instance.SoulPlugItems >= CombatModule.Instance.Settings.SoulPlugs.SoulDrainSettings.BaseDrain;
+    }
     public override void GiveImmediate(GiveInfo info)
     {
         CombatModule.Instance.SoulPlugItems += 1;
