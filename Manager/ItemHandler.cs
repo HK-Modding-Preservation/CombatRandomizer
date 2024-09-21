@@ -113,9 +113,9 @@ namespace CombatRandomizer.Manager {
             if (!CombatManager.Settings.Enabled)
                 return;
             
-            int nailDamage = 21 - CombatManager.Settings.NailSettings.NailDamageSettings.NailItems;
-            int soulGain = 11 - CombatManager.Settings.GainSettings.SoulGainSettings.SoulGainItems;
-            int soulPlug = 5 - CombatManager.Settings.DrainSettings.SoulDrainSettings.PlugItems;
+            int nailDamage = 21 - (CombatManager.Settings.NailSettings.Enabled ? CombatManager.Settings.NailSettings.NailDamageSettings.NailItems : 0);
+            int soulGain = 11 - (CombatManager.Settings.GainSettings.Enabled ? CombatManager.Settings.GainSettings.SoulGainSettings.SoulGainItems : 0);
+            int soulPlug = 5 - (CombatManager.Settings.DrainSettings.Enabled ? CombatManager.Settings.DrainSettings.SoulDrainSettings.PlugItems : 0);
 
             pi.Setters.Add(new(lm.GetTermStrict("NAILDAMAGE"), nailDamage));
             pi.Setters.Add(new(lm.GetTermStrict("SOULGAIN"), soulGain));
