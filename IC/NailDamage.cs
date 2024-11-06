@@ -15,7 +15,7 @@ public class NailDamage : AbstractItem
             shopDesc = new BoxedString("Do you even lift bro?"),
             sprite = new ItemChangerSprite("ShopIcons.Upslash")
         };
-        tags = [NailItemTag()];
+        tags = [NailItemTag(), CurseTag()];
     }
 
     private static InteropTag NailItemTag()
@@ -27,7 +27,14 @@ public class NailDamage : AbstractItem
         tag.Message = "RandoSupplementalMetadata";
         return tag;
     }
-
+    private InteropTag CurseTag()
+    {
+        InteropTag tag = new();
+        tag.Properties["CanMimic"] = new BoxedBool(true);
+        tag.Properties["MimicNames"] = new string[] {"Neil Damage", "Nail Damaged", "Nai1 Damage"};
+        tag.Message = "CurseData";
+        return tag;
+    }
     public override bool Redundant()
     {
         CombatModule.Instance.SetNailDamage();

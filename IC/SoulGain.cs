@@ -15,7 +15,7 @@ public class SoulGain : AbstractItem
             shopDesc = new BoxedString("Don't just defeat your enemies. Take their very essence."),
             sprite = new CombatSprite("SoulGain")
         };
-        tags = [SoulGainItemTag()];
+        tags = [SoulGainItemTag(), CurseTag()];
     }
 
     private static InteropTag SoulGainItemTag()
@@ -25,6 +25,15 @@ public class SoulGain : AbstractItem
         tag.Properties["PinSprite"] = new ItemChangerSprite("ShopIcons.Soul");
         tag.Properties["PoolGroup"] = "Soul Upgrades";
         tag.Message = "RandoSupplementalMetadata";
+        return tag;
+    }
+
+    private InteropTag CurseTag()
+    {
+        InteropTag tag = new();
+        tag.Properties["CanMimic"] = new BoxedBool(true);
+        tag.Properties["MimicNames"] = new string[] {"Soul Gain't", "Sol Gain", "Suol Gain"};
+        tag.Message = "CurseData";
         return tag;
     }
 

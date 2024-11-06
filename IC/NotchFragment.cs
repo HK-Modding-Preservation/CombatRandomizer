@@ -16,7 +16,7 @@ public class NotchFragment : AbstractItem
             shopDesc = new BoxedString("Maybe if we put them together..."),
             sprite = new ItemChangerSprite("ShopIcons.CharmNotch")
         };
-        tags = [NotchFragmentItemTag()];
+        tags = [NotchFragmentItemTag(), CurseTag()];
     }
 
     private static InteropTag NotchFragmentItemTag()
@@ -26,6 +26,15 @@ public class NotchFragment : AbstractItem
         tag.Properties["PinSprite"] = new ItemChangerSprite("ShopIcons.CharmNotch");
         tag.Properties["PoolGroup"] = "Charm Notches";
         tag.Message = "RandoSupplementalMetadata";
+        return tag;
+    }
+
+    private InteropTag CurseTag()
+    {
+        InteropTag tag = new();
+        tag.Properties["CanMimic"] = new BoxedBool(true);
+        tag.Properties["MimicNames"] = new string[] {"Not Fragment", "N0tch Fragment", "Charm Notch?"};
+        tag.Message = "CurseData";
         return tag;
     }
 

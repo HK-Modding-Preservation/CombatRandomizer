@@ -2,6 +2,7 @@ using CombatRandomizer.Modules;
 using ItemChanger;
 using ItemChanger.Tags;
 using ItemChanger.UIDefs;
+using RandomizerMod.Settings;
 
 namespace CombatRandomizer.IC;
 
@@ -15,7 +16,7 @@ public class SoulPlug : AbstractItem
             shopDesc = new BoxedString("Stop giving away your soul!"),
             sprite = new CombatSprite("SoulPlug")
         };
-        tags = [SoulPlugItemTag()];
+        tags = [SoulPlugItemTag(), CurseTag()];
     }
 
     private static InteropTag SoulPlugItemTag()
@@ -28,6 +29,14 @@ public class SoulPlug : AbstractItem
         return tag;
     }
 
+    private InteropTag CurseTag()
+    {
+        InteropTag tag = new();
+        tag.Properties["CanMimic"] = new BoxedBool(true);
+        tag.Properties["MimicNames"] = new string[] {"Soul Pug", "Sou1 Plug", "Soul P1ug", "Sol Plug"};
+        tag.Message = "CurseData";
+        return tag;
+    }
     public override bool Redundant()
     {
         return CombatModule.Instance.SoulPlugItems >= CombatModule.Instance.Settings.SoulPlugs.SoulDrainSettings.BaseDrain;
