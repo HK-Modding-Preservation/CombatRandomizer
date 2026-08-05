@@ -41,7 +41,8 @@ namespace CombatRandomizer.Modules
         {
             if (!Settings.NailSettings.Enabled)
                 return;
-            
+
+            SetNailDamage();
             int damage = PlayerData.instance.nailDamage;
             value += $"<br>This nail currently deals {damage} damage. ";
             if (damage < 5)
@@ -65,7 +66,7 @@ namespace CombatRandomizer.Modules
                 return;
             
             Frames += 1;
-            if (Frames >= 100)
+            if (Frames >= 200)
             {
                 int amount = Settings.SoulPlugs.SoulDrainSettings.BaseDrain - SoulPlugItems;
                 if (amount > 0)
@@ -92,7 +93,7 @@ namespace CombatRandomizer.Modules
             // Using these as reference, the charms will now grant a relative multiplier
             // instead of an absolute amount of soul per hit.
             float multiplier;
-            multiplier = soul / 11;
+            multiplier = soul / 11f;
 
             // Base gain depends on settings, and further gain is obtained with the item checks.
             soul = Settings.SoulGain.SoulGainSettings.BaseGain + SoulGainItems;

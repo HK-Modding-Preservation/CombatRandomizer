@@ -9,7 +9,7 @@ namespace CombatRandomizer
     public class CombatRandomizer : Mod, IGlobalSettings<CombatSettings> 
     {
         new public string GetName() => "CombatRandomizer";
-        public override string GetVersion() => "1.1.0.2";
+        public override string GetVersion() => "1.1.1.0";
 
         private static CombatRandomizer _instance;
         public CombatRandomizer() : base()
@@ -36,6 +36,8 @@ namespace CombatRandomizer
                 Instance.Log("Initializing...");
                 CombatManager.Hook();
                 
+                if (ModHooks.GetMod("ConnectionSettingsRando") is Mod)
+                    RSM_Interop.Hook();
                 if (ModHooks.GetMod("RandoSettingsManager") is Mod)
                     RSM_Interop.Hook();
                 

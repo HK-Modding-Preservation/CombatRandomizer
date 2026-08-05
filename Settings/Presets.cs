@@ -12,23 +12,23 @@ namespace CombatRandomizer.Settings
         };
         public static NailDamageSettings Standard => new()
         {
-            BaseDamage = 4,
-            NailItems = 19
-        };
-        public static NailDamageSettings Intermediate => new()
-        {
             BaseDamage = 3,
             NailItems = 18
         };
-        public static NailDamageSettings Hard => new()
+        public static NailDamageSettings Intermediate => new()
         {
-            BaseDamage = 3,
-            NailItems = 10
+            BaseDamage = 2,
+            NailItems = 15
         };
-        public static NailDamageSettings Extreme => new()
+        public static NailDamageSettings Hard => new()
         {
             BaseDamage = 2,
             NailItems = 7
+        };
+        public static NailDamageSettings Extreme => new()
+        {
+            BaseDamage = 1,
+            NailItems = 4
         };
 
         public static readonly Dictionary<string, NailDamageSettings> Presets = new()
@@ -100,8 +100,8 @@ namespace CombatRandomizer.Settings
 
         public static SoulGainSettings Hard => new()
         {
-            BaseGain = 3,
-            SoulGainItems = 5
+            BaseGain = 2,
+            SoulGainItems = 6
         };
 
         public static SoulGainSettings Extreme => new()
@@ -125,7 +125,7 @@ namespace CombatRandomizer.Settings
         public static SoulDrainSettings Easy => new()
         {
             BaseDrain = 1,
-            PlugItems = 2
+            PlugItems = 3
         };
         public static SoulDrainSettings Standard => new()
         {
